@@ -8,8 +8,8 @@
 | TeamName    |      StillThinking     |
 | Captain     |       Jarrett Cura     |
 | Captain     |   cura2@illinois.edu   |
-| Member1     |                        |
-| Member1     |                        |
+| Member1     |       Kaiyao Ke        |
+| Member1     |  kaiyaok2@illinois.edu |
 | Member2     |                        |
 | Member2     |                        |
 | Member3     |                        |

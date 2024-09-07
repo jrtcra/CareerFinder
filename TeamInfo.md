@@ -12,8 +12,8 @@
 | Member1     |  kaiyaok2@illinois.edu |
 | Member2     |       Kelly Lin        |
 | Member2     |   klin43@illinois.edu  |
-| Member3     |                        |
-| Member3     |                        |
+| Member3     |       Victor Zhao      |
+| Member3     |  chenyan4@illinois.edu |
 
 ## Project Information
 

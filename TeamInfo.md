@@ -10,8 +10,8 @@
 | Captain     |   cura2@illinois.edu   |
 | Member1     |       Kaiyao Ke        |
 | Member1     |  kaiyaok2@illinois.edu |
-| Member2     |                        |
-| Member2     |                        |
+| Member2     |       Kelly Lin        |
+| Member2     |   klin43@illinois.edu  |
 | Member3     |                        |
 | Member3     |                        |
 

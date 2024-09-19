@@ -19,10 +19,12 @@
 
 |   Info      |        Description     |
 | ----------- | ---------------------- |
-|  Title      |       ProjectTitle     |
+|  Title      |      Career Finder     |
 | System URL  |      link_to_system    |
 | Video Link  |      link_to_video     |
 
 ## Project Summary
 
-This is a summary of the project!
+Career Finder is a web-based application designed to help users discover potential career paths based on their skills, interests, and personal values. By analyzing data on various job roles, required qualifications, and career trends, the system provides personalized career suggestions. Users can input their personal attributes, and the system will recommend career options using a database of professions that includes detailed information about required skills, job outlook, work environment, and average salaries. 
+
+Using database manipulation techniques and machine learning involved analysis, Career Finder recommends careers that closely match the user’s profile, enabling them to make informed decisions about their future. Additionally, users can utilize a reverse-matching feature that identifies the closest skill sets required for a specific career, providing even more tailored guidance in exploring new opportunities.

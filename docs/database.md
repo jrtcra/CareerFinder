@@ -20,10 +20,12 @@
     - A company can make several postings for different jobs
 - postings ↔ jobs
     - one to one
-    - Each posting much be only for one job, because the information provided in the posting will be for that job
+    - Each posting must be only for one job, because the information provided in the posting will be for that job
     - Assumption: Each job must only be posted once, to keep the information in the postings consistent. 
 
-# Functional Dependency
+# Functional Dependencies/Normalization
+Our database design was initially planned to be normalized to 3NF. Because our database already avoids many potential issues (duplication of data, data anomalies, referential integrity, etc.) through its simplistic design, we can simply look at the functional dependencies of each table.
+
 - user_id -> username, password
 - skill_abbr -> embedding, skill_name
 - company_id -> company_name, company_description

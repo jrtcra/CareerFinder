@@ -19,13 +19,14 @@
     - Each posting must be only posted by one company
     - A company can make several postings for different jobs
 - postings ↔ jobs
-    - one to one
-    - Each posting must be only for one job, because the information provided in the posting will be for that job
-    - Assumption: Each job must only be posted once, to keep the information in the postings consistent. 
+    - many to one
+    - Each job will have multiple postings, because one job can be posted multiple times to the same job board or different job boards
+    - Assumption: Each job can be posted multiple times to the same or different job boards. This is necessary for scalability as we add more job postings from our original source (LinkedIn Job boards) or from other datasets (Glassdoor or Indeed APIs/datasets)
 
 # Functional Dependencies/Normalization
-Our database design was initially planned to be normalized to 3NF. Because our database already avoids many potential issues (duplication of data, data anomalies, referential integrity, etc.) through its simplistic design, we can simply look at the functional dependencies of each table.
+Our database design was initially planned to be normalized to 3NF. Because our database already avoids many potential issues (duplication of data, data anomalies, referential integrity, etc.) through its simplistic design, we can simply look at the functional dependencies of each table. For scalability reasons and if we ever need to modify, we will maintain a 3NF schematic.
 
+3NF:
 - user_id -> username, password
 - skill_abbr -> embedding, skill_name
 - company_id -> company_name, company_description
@@ -52,4 +53,4 @@ skill_lists(user_id: INT [FK to user_information.user_id], skill_abbr: VARCHAR(X
 posting_skills(skill_abbr: VARCHAR(X) [FK to skills.skill_abbr], posting_id: INT [FK to postings.posting_id], [PK: skill_abbr, posting_id])
 
 # UML
-<img src="UML.png" height="300">
+<img src="UML-revised.png" height="300">

@@ -1,0 +1,5 @@
+- Changed relation of postings ↔ jobs from one-to-one to many-to-one
+- Justified new relation
+- Added context for normalized database
+- Specified 3NF Schema
+- Updated UML Diagram

@@ -24,8 +24,10 @@ CREATE TABLE
         posting_id BIGINT PRIMARY KEY,
         posting_title VARCHAR(10) NOT NULL,
         posting_description VARCHAR(2048),
-        FOREIGN KEY job_id NOT NULL REFERENCES jobs(job_id) ON DELETE CASCADE ON UPDATE CASCADE,
-        FOREIGN KEY company_id NOT NULL REFERENCES companies(company_id) ON DELETE CASCADE ON UPDATE CASCADE,
+        job_id BIGINT NOT NULL,
+        company_id BIGINT NOT NULL,
+        FOREIGN KEY (job_id) REFERENCES jobs(job_id) ON DELETE CASCADE ON UPDATE CASCADE,
+        FOREIGN KEY (company_id) REFERENCES companies(company_id) ON DELETE CASCADE ON UPDATE CASCADE
     );
 
 CREATE TABLE
@@ -46,7 +48,7 @@ CREATE TABLE
     IF NOT EXISTS companies (
         company_id BIGINT PRIMARY KEY,
         company_name VARCHAR(10) NOT NULL,
-        company_description VARCHAR(2048),
+        company_description VARCHAR(2048)
     );
 
 

@@ -13,31 +13,6 @@ CREATE TABLE
     );
 
 CREATE TABLE
-    IF NOT EXISTS user_skills (
-        user_id BIGINT NOT NULL REFERENCES user_information ON DELETE CASCADE ON UPDATE CASCADE,
-        skill_abbr VARCHAR(10) NOT NULL REFERENCES skills ON DELETE CASCADE ON UPDATE CASCADE,
-        PRIMARY KEY (user_id, skill_abbr)
-    );
-
-CREATE TABLE
-    IF NOT EXISTS postings (
-        posting_id BIGINT PRIMARY KEY,
-        posting_title VARCHAR(10) NOT NULL,
-        posting_description VARCHAR(2048),
-        job_id BIGINT NOT NULL,
-        company_id BIGINT NOT NULL,
-        FOREIGN KEY (job_id) REFERENCES jobs(job_id) ON DELETE CASCADE ON UPDATE CASCADE,
-        FOREIGN KEY (company_id) REFERENCES companies(company_id) ON DELETE CASCADE ON UPDATE CASCADE
-    );
-
-CREATE TABLE
-    IF NOT EXISTS posting_skills (
-        posting_id BIGINT NOT NULL REFERENCES postings ON DELETE CASCADE ON UPDATE CASCADE,
-        skill_abbr VARCHAR(10) NOT NULL REFERENCES skills ON DELETE CASCADE ON UPDATE CASCADE,
-        PRIMARY KEY (skill_abbr, posting_id)
-    );
-
-CREATE TABLE
     IF NOT EXISTS jobs (
         job_id BIGINT PRIMARY KEY,
         max_salary REAL,
@@ -51,7 +26,30 @@ CREATE TABLE
         company_description VARCHAR(2048)
     );
 
+CREATE TABLE
+    IF NOT EXISTS postings (
+        posting_id BIGINT PRIMARY KEY,
+        posting_title VARCHAR(10) NOT NULL,
+        posting_description VARCHAR(2048),
+        job_id BIGINT NOT NULL,
+        company_id BIGINT NOT NULL,
+        FOREIGN KEY (job_id) REFERENCES jobs (job_id) ON DELETE CASCADE ON UPDATE CASCADE,
+        FOREIGN KEY (company_id) REFERENCES companies (company_id) ON DELETE CASCADE ON UPDATE CASCADE
+    );
 
+CREATE TABLE
+    IF NOT EXISTS posting_skills (
+        posting_id BIGINT NOT NULL REFERENCES postings ON DELETE CASCADE ON UPDATE CASCADE,
+        skill_abbr VARCHAR(10) NOT NULL REFERENCES skills ON DELETE CASCADE ON UPDATE CASCADE,
+        PRIMARY KEY (skill_abbr, posting_id)
+    );
+
+CREATE TABLE
+    IF NOT EXISTS user_skills (
+        user_id BIGINT NOT NULL REFERENCES user_information ON DELETE CASCADE ON UPDATE CASCADE,
+        skill_abbr VARCHAR(10) NOT NULL REFERENCES skills ON DELETE CASCADE ON UPDATE CASCADE,
+        PRIMARY KEY (user_id, skill_abbr)
+    );
 
 -- CREATE TABLE IF NOT EXISTS submission_grading_context_embeddings (
 --   id bigserial PRIMARY KEY,

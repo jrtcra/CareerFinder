@@ -1,0 +1,5 @@
+query 1: 
+without indexing: 2.73
+index on postings (posting_title): 2.15
+index on companies (company_name): 2
+index on both: 1.87

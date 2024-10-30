@@ -3,3 +3,6 @@ without indexing: 2.73
 index on postings (posting_title): 2.15
 index on companies (company_name): 2
 index on both: 1.87
+
+with/without indexing on embeddings & company descriptions: 1.4
+The filters are based on substrings and distance from another value, which is not using the index, so creating an index doesn't help

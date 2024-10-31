@@ -11,7 +11,7 @@ WHERE
     ui.age < 25
 GROUP BY
     ui.user_id,
-    s.skill_name
+    s.skill_abbr
 HAVING
     COUNT(DISTINCT p.posting_id) >= (
         0.1 * (
@@ -32,7 +32,7 @@ FROM
     JOIN postings p ON ps.posting_id = p.posting_id
 GROUP BY
     ui.user_id,
-    s.skill_name
+    s.skill_abbr
 HAVING
     COUNT(DISTINCT p.posting_id) < (
         0.01 * (

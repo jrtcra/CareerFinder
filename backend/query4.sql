@@ -1,5 +1,8 @@
 -- order all postings based on similarity between needed skills and skills the user has
-SELECT
+CREATE INDEX embedding_idx ON skills(embedding);
+-- DROP INDEX embedding_idx ON skills;
+
+explain analyze SELECT
     posting_skill_numerics.posting_id
 FROM
     (

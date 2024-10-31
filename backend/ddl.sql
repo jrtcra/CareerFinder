@@ -2,7 +2,9 @@ CREATE TABLE
     IF NOT EXISTS user_information (
         user_id BIGINT AUTO_INCREMENT PRIMARY KEY,
         username VARCHAR(20) NOT NULL,
-        password VARCHAR(50) NOT NULL
+        password VARCHAR(50) NOT NULL,
+        age INT NOT NULL,
+        state VARCHAR(2) NOT NULL
     );
 
 CREATE TABLE
@@ -54,3 +56,5 @@ CREATE TABLE
 CREATE INDEX posting_title_idx ON postings (posting_title);
 
 CREATE INDEX company_name_idx ON companies (company_name);
+
+CREATE INDEX user_age_idx ON user_information (age);

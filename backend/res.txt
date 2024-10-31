@@ -4,5 +4,15 @@ index on postings (posting_title): 2.15
 index on companies (company_name): 2
 index on both: 1.87
 
+query 5:
 with/without indexing on embeddings & company descriptions: 1.4
 The filters are based on substrings and distance from another value, which is not using the index, so creating an index doesn't help
+
+query 2:
+without index: 69121
+with index on age:  24493
+with index on both: 24493
+On create index on age: we have a search on age which can be improved a lot with a b-tree. 
+
+query 4: 
+with/without indexing on embeddings: 817

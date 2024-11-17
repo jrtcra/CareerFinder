@@ -1,0 +1,30 @@
+version: "3.8"
+services:
+  nodejs:
+    image: node:20 # Replace with your desired Node.js version
+    container_name: nodejs_app
+    working_dir: /app
+    volumes:
+      - .:/app
+    ports:
+      - "3000:3000" # Map your Node.js server port
+    command: "npm start" # Adjust as needed for your application
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql:8 # Replace with your desired MySQL version
+    container_name: mysql_db
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: cs411
+      MYSQL_USER: StillThinking
+      MYSQL_PASSWORD: password
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./mysql-files:/var/lib/mysql-files
+
+volumes:
+  db_data:

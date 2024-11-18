@@ -8,6 +8,10 @@ export interface UserInformationType extends RowDataPacket {
   state: string;
 }
 
+export interface SkillAbbrType extends RowDataPacket {
+  skill_abbr: string;
+}
+
 export async function connectToDatabase(): Promise<Connection> {
   const connection = await mysql.createConnection({
     host: "mysql", // Use service name defined in docker-compose.yml
@@ -26,9 +30,52 @@ export async function verifyLogin(
   const connection = await connectToDatabase();
 
   const [rows] = await connection.query<UserInformationType[]>(
-    `SELECT * FROM user_information WHERE username=? AND password=?`, 
+    "SELECT * FROM user_information WHERE username = ? AND password = ?",
     [username, password]
   );
 
   return rows;
+}
+
+export async function getAllSkills(): Promise<SkillAbbrType[]> {
+  const connection = await connectToDatabase();
+
+  const [rows] = await connection.query<SkillAbbrType[]>(
+    "SELECT skill_abbr FROM skills"
+  );
+  return rows;
+}
+
+export async function getUserSkills(user_id: number): Promise<SkillAbbrType[]> {
+  const connection = await connectToDatabase();
+
+  const [rows] = await connection.query<SkillAbbrType[]>(
+    "SELECT skill_abbr FROM user_skills WHERE user_id = ?",
+    [user_id]
+  );
+  return rows;
+}
+
+export async function addUserSkill(
+  user_id: number,
+  skill_abbr: string
+): Promise<void> {
+  const connection = await connectToDatabase();
+
+  await connection.query(
+    "INSERT INTO user_skills (user_id, skill_abbr) VALUES (?, ?)",
+    [user_id, skill_abbr]
+  );
+}
+
+export async function removeUserSkill(
+  user_id: number,
+  skill_abbr: string
+): Promise<void> {
+  const connection = await connectToDatabase();
+
+  await connection.query(
+    "DELETE FROM user_skills WHERE user_id = ? AND skill_abbr = ?",
+    [user_id, skill_abbr]
+  );
 }

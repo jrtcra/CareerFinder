@@ -1,16 +1,40 @@
 import express, { Request, Response, NextFunction } from "express";
+import session from "express-session";
 import asyncHandler from "express-async-handler";
+import path from "path";
 
-import { renderLoginPageHTML, renderDashboard } from "./index.html";
-import { verifyLogin, UserInformationType } from "./sql-helper";
+import {
+  renderLoginPageHTML,
+  renderDashboard,
+  renderSkillsHTML,
+} from "./index.html";
+import {
+  verifyLogin,
+  UserInformationType,
+  getAllSkills,
+  getUserSkills,
+  addUserSkill,
+  removeUserSkill,
+} from "./sql-helper";
 
 const app = express();
 const PORT = 3000;
 
 app.use(express.json());
+app.use("/js", express.static(path.join(__dirname, "js")));
 
-// Middleware information
-let userInformation: UserInformationType;
+declare module "express-session" {
+  interface SessionData {
+    userInformation: UserInformationType;
+  }
+}
+app.use(
+  session({
+    secret: "your_secret_key", // Use an environment variable for production
+    resave: false,
+    saveUninitialized: true,
+  })
+);
 
 // Main page
 app.get("/", renderLoginPageHTML);
@@ -22,7 +46,7 @@ app.post(
     const { username, password } = req.body;
     const verifyResult = await verifyLogin(username, password);
     if (verifyResult.length) {
-      userInformation = verifyResult[0];
+      req.session.userInformation = verifyResult[0];
       res.json({ success: true, redirect: "/dashboard" });
     } else {
       res.json({ success: false, message: "Invalid username or password." });
@@ -30,8 +54,62 @@ app.post(
   })
 );
 
+// Handle skill addition
+app.post(
+  "/skills/add",
+  asyncHandler(async (req: Request, res: Response) => {
+    if (!req.session.userInformation) {
+      throw new Error("User information not defined");
+    }
+    const skill = req.body;
+    await addUserSkill(req.session.userInformation.user_id, skill.skill);
+    res.json({ ok: true });
+  })
+);
+
+// Handle skill removing
+app.post(
+  "/skills/remove",
+  asyncHandler(async (req: Request, res: Response) => {
+    if (!req.session.userInformation) {
+      throw new Error("User information not defined");
+    }
+    const skill = req.body;
+    await removeUserSkill(req.session.userInformation.user_id, skill.skill);
+    res.json({ ok: true });
+  })
+);
+
 app.get("/dashboard", (req, res) => {
-  renderDashboard(req, res, userInformation);
+  if (!req.session.userInformation) {
+    throw new Error("User information not defined");
+  }
+  renderDashboard(req, res, req.session.userInformation);
+});
+
+app.get("/skills", (req, res) => {
+  renderSkillsHTML(req, res);
+});
+
+app.get("/api/all-skills", async (req: Request, res: Response) => {
+  const queryResult = await getAllSkills();
+  let allSkills = [];
+  for (const skill of queryResult) {
+    allSkills.push(skill.skill_abbr);
+  }
+  res.json({ allSkills });
+});
+
+app.get("/api/user-skills", async (req: Request, res: Response) => {
+  if (!req.session.userInformation) {
+    throw new Error("User information not defined");
+  }
+  const queryResult = await getUserSkills(req.session.userInformation.user_id);
+  let userSkills: string[] = [];
+  for (const skill of queryResult) {
+    userSkills.push(skill.skill_abbr);
+  }
+  res.json({ userSkills });
 });
 
 app.listen(PORT, () => {

@@ -252,10 +252,6 @@ export function renderSearchHTML(req: Request, res: Response) {
   res.send(htmlContent);
 }
 
-// export function renderMatchingHTML(req: Request, res: Response) {
-  
-// }
-
 export function renderDetailHTML(req: Request, res: Response, detail: JobDetailType, skills: SkillAbbrType[]) {
   let skill_str = '';
   skills.forEach((skill) => {skill_str += skill.skill_abbr;skill_str += ' ';})

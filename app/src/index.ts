@@ -5,16 +5,20 @@ import path from "path";
 
 import {
   renderLoginPageHTML,
+  renderSignupPageHTML,
   renderDashboard,
   renderSkillsHTML,
+  renderProfileHTML,
 } from "./index.html";
 import {
   verifyLogin,
+  createUser,
   UserInformationType,
   getAllSkills,
   getUserSkills,
   addUserSkill,
   removeUserSkill,
+  updateUserPassword,
 } from "./sql-helper";
 
 const app = express();
@@ -38,6 +42,40 @@ app.use(
 
 // Main page
 app.get("/", renderLoginPageHTML);
+
+app.get("/signup", renderSignupPageHTML);
+
+app.post(
+  "/signup",
+  asyncHandler(async (req: Request, res: Response) => {
+    const { username, password, age, state } = req.body;
+    
+    // Basic validation
+    if (!username || !password || !age || !state) {
+      res.json({ success: false, message: "All fields are required." });
+      return;
+    }
+    
+    if (age < 18 || age > 120) {
+      res.json({ success: false, message: "Please enter a valid age." });
+      return;
+    }
+    
+    if (state.length !== 2) {
+      res.json({ success: false, message: "Please enter a valid 2-letter state code." });
+      return;
+    }
+
+    const success = await createUser(username, password, age, state);
+    if (success) {
+      const verifyResult = await verifyLogin(username, password);
+      req.session.userInformation = verifyResult[0];
+      res.json({ success: true, redirect: "/dashboard" });
+    } else {
+      res.json({ success: false, message: "Username already exists." });
+    }
+  })
+);
 
 // Handle login form submission
 app.post(
@@ -115,3 +153,31 @@ app.get("/api/user-skills", async (req: Request, res: Response) => {
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
+
+app.get("/profile", (req, res) => {
+  if (!req.session.userInformation) {
+    res.redirect("/");
+    return;
+  }
+  renderProfileHTML(req, res);
+});
+
+app.post("/api/update-password", asyncHandler(async (req: Request, res: Response) => {
+  if (!req.session.userInformation) {
+    res.status(401).json({ success: false, message: "Not authenticated" });
+    return;
+  }
+
+  const { oldPassword, newPassword } = req.body;
+  const success = await updateUserPassword(
+    req.session.userInformation.user_id,
+    oldPassword,
+    newPassword
+  );
+
+  if (success) {
+    res.json({ success: true, message: "Password updated successfully" });
+  } else {
+    res.json({ success: false, message: "Current password is incorrect" });
+  }
+}));

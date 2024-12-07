@@ -79,3 +79,56 @@ export async function removeUserSkill(
     [user_id, skill_abbr]
   );
 }
+
+export async function updateUserPassword(
+  userId: number,
+  oldPassword: string,
+  newPassword: string
+): Promise<boolean> {
+  const connection = await connectToDatabase();
+
+  // First verify the old password
+  const [rows] = await connection.query<UserInformationType[]>(
+    "SELECT * FROM user_information WHERE user_id = ? AND password = ?",
+    [userId, oldPassword]
+  );
+
+  if (rows.length === 0) {
+    return false;
+  }
+
+  // Update the password
+  await connection.query(
+    "UPDATE user_information SET password = ? WHERE user_id = ?",
+    [newPassword, userId]
+  );
+
+  return true;
+}
+
+export async function createUser(
+  username: string,
+  password: string,
+  age: number,
+  state: string
+): Promise<boolean> {
+  const connection = await connectToDatabase();
+
+  // First check if username already exists
+  const [existing] = await connection.query<UserInformationType[]>(
+    "SELECT username FROM user_information WHERE username = ?",
+    [username]
+  );
+
+  if (existing.length > 0) {
+    return false;
+  }
+
+  // Create new user
+  await connection.query(
+    "INSERT INTO user_information (username, password, age, state) VALUES (?, ?, ?, ?)",
+    [username, password, age, state]
+  );
+
+  return true;
+}

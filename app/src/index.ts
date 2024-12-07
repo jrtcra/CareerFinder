@@ -7,6 +7,7 @@ import {
   renderLoginPageHTML,
   renderDashboard,
   renderSkillsHTML,
+  renderProfileHTML,
 } from "./index.html";
 import {
   verifyLogin,
@@ -15,6 +16,7 @@ import {
   getUserSkills,
   addUserSkill,
   removeUserSkill,
+  updateUserPassword,
 } from "./sql-helper";
 
 const app = express();
@@ -115,3 +117,31 @@ app.get("/api/user-skills", async (req: Request, res: Response) => {
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
+
+app.get("/profile", (req, res) => {
+  if (!req.session.userInformation) {
+    res.redirect("/");
+    return;
+  }
+  renderProfileHTML(req, res);
+});
+
+app.post("/api/update-password", asyncHandler(async (req: Request, res: Response) => {
+  if (!req.session.userInformation) {
+    res.status(401).json({ success: false, message: "Not authenticated" });
+    return;
+  }
+
+  const { oldPassword, newPassword } = req.body;
+  const success = await updateUserPassword(
+    req.session.userInformation.user_id,
+    oldPassword,
+    newPassword
+  );
+
+  if (success) {
+    res.json({ success: true, message: "Password updated successfully" });
+  } else {
+    res.json({ success: false, message: "Current password is incorrect" });
+  }
+}));

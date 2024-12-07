@@ -71,6 +71,7 @@ export function renderDashboard(
         <p>This is a protected page accessible only after login.</p>
         <a href="/">Go back to login</a>
         <a href="/skills">Manage skills</a>
+        <a href="/profile">Update profile</a>
       </body>
       </html>
     `;
@@ -161,9 +162,130 @@ export function renderSkillsHTML(req: Request, res: Response) {
         </div>
       </div>
     </div>
-
     <script src="js/skills.js"></script>
   </body>
   </html>`;
+  res.send(htmlContent);
+}
+
+export function renderProfileHTML(req: Request, res: Response) {
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Edit Profile</title>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          max-width: 600px;
+          margin: 0 auto;
+          padding: 20px;
+        }
+        .form-group {
+          margin-bottom: 15px;
+        }
+        label {
+          display: block;
+          margin-bottom: 5px;
+        }
+        input[type="password"] {
+          width: 100%;
+          padding: 8px;
+          margin-bottom: 10px;
+        }
+        button {
+          background-color: #007bff;
+          color: white;
+          padding: 10px 15px;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+        }
+        button:hover {
+          background-color: #0056b3;
+        }
+        .error-message {
+          color: red;
+          margin-top: 10px;
+          display: none;
+        }
+        .success-message {
+          color: green;
+          margin-top: 10px;
+          display: none;
+        }
+      </style>
+    </head>
+    <body>
+      <h1>Edit Profile</h1>
+      <form id="password-form">
+        <div class="form-group">
+          <label for="oldPassword">Old Password:</label>
+          <input type="password" id="oldPassword" name="oldPassword" required>
+        </div>
+        <div class="form-group">
+          <label for="newPassword">New Password:</label>
+          <input type="password" id="newPassword" name="newPassword" required>
+        </div>
+        <div class="form-group">
+          <label for="confirmPassword">Confirm New Password:</label>
+          <input type="password" id="confirmPassword" name="confirmPassword" required>
+        </div>
+        <button type="button" onclick="updatePassword()">Update Password</button>
+      </form>
+      <div id="errorMessage" class="error-message"></div>
+      <div id="successMessage" class="success-message"></div>
+      <p><a href="/dashboard">Back to Dashboard</a></p>
+
+      <script>
+        async function updatePassword() {
+          const oldPassword = document.getElementById('oldPassword').value;
+          const newPassword = document.getElementById('newPassword').value;
+          const confirmPassword = document.getElementById('confirmPassword').value;
+          const errorMessage = document.getElementById('errorMessage');
+          const successMessage = document.getElementById('successMessage');
+
+          errorMessage.style.display = 'none';
+          successMessage.style.display = 'none';
+
+          if (newPassword !== confirmPassword) {
+            errorMessage.textContent = 'New passwords do not match';
+            errorMessage.style.display = 'block';
+            return;
+          }
+
+          try {
+            const response = await fetch('/api/update-password', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                oldPassword,
+                newPassword
+              }),
+            });
+
+            const result = await response.json();
+            
+            if (result.success) {
+              successMessage.textContent = 'Password updated successfully';
+              successMessage.style.display = 'block';
+              document.getElementById('password-form').reset();
+            } else {
+              errorMessage.textContent = result.message;
+              errorMessage.style.display = 'block';
+            }
+          } catch (error) {
+            errorMessage.textContent = 'An error occurred while updating the password';
+            errorMessage.style.display = 'block';
+          }
+        }
+      </script>
+    </body>
+    </html>
+  `;
   res.send(htmlContent);
 }

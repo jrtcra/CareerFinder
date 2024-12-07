@@ -62,6 +62,55 @@ CREATE INDEX company_name_idx ON companies (company_name);
 
 CREATE INDEX user_age_idx ON user_information (age);
 
+DELIMITER //
+
+-- If salary is less than 1000, assume it's in thousands and convert
+-- Drop existing trigger if it exists
+DROP TRIGGER IF EXISTS before_jobs_update//
+
+-- Create trigger for normalizing salaries on UPDATE
+CREATE TRIGGER before_jobs_update
+BEFORE UPDATE ON jobs
+FOR EACH ROW
+BEGIN
+    -- Handle max_salary normalization
+    IF NEW.max_salary IS NOT NULL THEN
+        IF NEW.max_salary < 1000 AND NEW.max_salary > 0 THEN
+            SET NEW.max_salary = NEW.max_salary * 1000;
+        END IF;
+    END IF;
+
+    -- Handle med_salary normalization
+    IF NEW.med_salary IS NOT NULL THEN
+        IF NEW.med_salary < 1000 AND NEW.med_salary > 0 THEN
+            SET NEW.med_salary = NEW.med_salary * 1000;
+        END IF;
+    END IF;
+END//
+
+DROP TRIGGER IF EXISTS before_jobs_insert//
+
+CREATE TRIGGER before_jobs_insert
+BEFORE INSERT ON jobs
+FOR EACH ROW
+BEGIN
+    -- Handle max_salary normalization
+    IF NEW.max_salary IS NOT NULL THEN
+        IF NEW.max_salary < 1000 AND NEW.max_salary > 0 THEN
+            SET NEW.max_salary = NEW.max_salary * 1000;
+        END IF;
+    END IF;
+
+    -- Handle med_salary normalization
+    IF NEW.med_salary IS NOT NULL THEN
+        IF NEW.med_salary < 1000 AND NEW.med_salary > 0 THEN
+            SET NEW.med_salary = NEW.med_salary * 1000;
+        END IF;
+    END IF;
+END//
+
+DELIMITER ;
+
 LOAD DATA INFILE '/var/lib/mysql-files/jobs_values.csv' 
 INTO TABLE `jobs` 
 COLUMNS TERMINATED BY ',' ENCLOSED BY '\"' 

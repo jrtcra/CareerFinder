@@ -1,0 +1,98 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  /* Body styles */
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #d0dbc4;
+  }
+  
+  /* Header styles */
+  header {
+    background-color: #1a3d2c;
+    padding: 1rem;
+  }
+  
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .header-content h1 {
+    color: #fff;
+  }
+  
+  .user-profile img {
+    width: 32px;
+    height: 32px;
+  }
+  
+  /* Main content styles */
+  main {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 2rem;
+  }
+  
+  /* Career details section */
+  .career-details {
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .career-details h2 {
+    margin-bottom: 2rem; /* spacing between title and content */
+    color: #333;
+  }
+  
+  .career-info h3 {
+    margin-bottom: 1.5rem;
+    color: #333;
+  }
+  
+  .career-info p, .career-info ul {
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .career-info ul {
+    list-style: inside;
+  }
+  
+  footer {
+    text-align: center;
+    padding: 1.5rem;
+    background-color: #1a3d2c;
+    color: white;
+  }
+  
+  .pagination a {
+    color: white;
+    text-decoration: none;
+    margin: 0 1rem;
+    font-weight: bold;
+  }
+  
+  .pagination a:hover {
+    text-decoration: underline;
+  }
+  
+  /* Responsive styles */
+  @media (max-width: 1024px) {
+    main {
+      padding: 0 1rem;
+    }
+  
+    .career-details {
+      padding: 1rem;
+    }
+  }
+  

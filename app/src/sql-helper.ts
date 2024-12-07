@@ -12,6 +12,12 @@ export interface SkillAbbrType extends RowDataPacket {
   skill_abbr: string;
 }
 
+export interface PostingInformationType extends RowDataPacket {
+  posting_description: string;
+  posting_title: string;
+  company_name: string;
+}
+
 export async function connectToDatabase(): Promise<Connection> {
   const connection = await mysql.createConnection({
     host: "mysql", // Use service name defined in docker-compose.yml
@@ -78,4 +84,29 @@ export async function removeUserSkill(
     "DELETE FROM user_skills WHERE user_id = ? AND skill_abbr = ?",
     [user_id, skill_abbr]
   );
+}
+
+export async function getMatchingJobs(
+  user_id: number
+): Promise<PostingInformationType[]> {
+  const connection = await connectToDatabase();
+
+  const [rows] = await connection.query<PostingInformationType[]>(
+    "CALL GetMatchingPostings(?)",
+    [user_id]
+  );
+  return rows;
+}
+
+export async function searchJobPosting(
+  min_salary: number,
+  max_salary: number
+): Promise<PostingInformationType[]> {
+  const connection = await connectToDatabase();
+
+  const [rows] = await connection.query<PostingInformationType[]>(
+    "CALL SearchForJobs(?, ?)",
+    [min_salary, max_salary]
+  );
+  return rows;
 }

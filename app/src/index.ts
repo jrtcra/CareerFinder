@@ -1,4 +1,4 @@
-import express, { Request, Response, NextFunction } from "express";
+import express, { Request, Response, NextFunction, application } from "express";
 import session from "express-session";
 import asyncHandler from "express-async-handler";
 import path from "path";
@@ -7,6 +7,7 @@ import {
   renderLoginPageHTML,
   renderDashboard,
   renderSkillsHTML,
+  renderSearchHTML,
 } from "./index.html";
 import {
   verifyLogin,
@@ -15,6 +16,8 @@ import {
   getUserSkills,
   addUserSkill,
   removeUserSkill,
+  searchJobPosting,
+  getMatchingJobs,
 } from "./sql-helper";
 
 const app = express();
@@ -54,6 +57,22 @@ app.post(
   })
 );
 
+// Handle job search
+app.post(
+  "/searching",
+  asyncHandler(async (req: Request, res: Response) => {
+    let { minsal, maxsal } = req.body;
+    if (!minsal) {
+      minsal = 0;
+    }
+    if (!maxsal) {
+      maxsal = 1e30;
+    }
+    const searchResult = await searchJobPosting(minsal, maxsal);
+    res.json(searchResult[0]);
+  })
+);
+
 // Handle skill addition
 app.post(
   "/skills/add",
@@ -90,6 +109,22 @@ app.get("/dashboard", (req, res) => {
 app.get("/skills", (req, res) => {
   renderSkillsHTML(req, res);
 });
+
+app.get(
+  "/search",
+  // asyncHandler(async (req: Request, res: Response) => {
+  //   if (!req.session.userInformation) {
+  //     throw new Error("User information not defined");
+  //   }
+  //   const postingResult = await searchJobPosting(
+  //     req.session.userInformation?.user_id
+  //   );
+  //   console.log(postingResult);
+  // })
+  (req, res) => {
+    renderSearchHTML(req, res);
+  }
+);
 
 app.get("/api/all-skills", async (req: Request, res: Response) => {
   const queryResult = await getAllSkills();

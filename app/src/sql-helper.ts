@@ -105,3 +105,30 @@ export async function updateUserPassword(
 
   return true;
 }
+
+export async function createUser(
+  username: string,
+  password: string,
+  age: number,
+  state: string
+): Promise<boolean> {
+  const connection = await connectToDatabase();
+
+  // First check if username already exists
+  const [existing] = await connection.query<UserInformationType[]>(
+    "SELECT username FROM user_information WHERE username = ?",
+    [username]
+  );
+
+  if (existing.length > 0) {
+    return false;
+  }
+
+  // Create new user
+  await connection.query(
+    "INSERT INTO user_information (username, password, age, state) VALUES (?, ?, ?, ?)",
+    [username, password, age, state]
+  );
+
+  return true;
+}

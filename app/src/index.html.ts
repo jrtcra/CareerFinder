@@ -10,22 +10,62 @@ export function renderLoginPageHTML(req: Request, res: Response) {
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Job-Seeker</title>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          max-width: 600px;
+          margin: 0 auto;
+          padding: 20px;
+        }
+        .form-group {
+          margin-bottom: 15px;
+        }
+        label {
+          display: block;
+          margin-bottom: 5px;
+        }
+        input {
+          width: 100%;
+          padding: 8px;
+          margin-bottom: 10px;
+        }
+        button {
+          background-color: #007bff;
+          color: white;
+          padding: 10px 15px;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+        }
+        button:hover {
+          background-color: #0056b3;
+        }
+        .signup-link {
+          margin-top: 15px;
+          text-align: center;
+        }
+      </style>
     </head>
     <body>
       <h1>Welcome to Job-Seeker! Please log in.</h1>
-    </body>
 
-    <form id="login-form">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required />
-        <br><br>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required />
-        <br><br>
+      <form id="login-form">
+        <div class="form-group">
+          <label for="username">Username:</label>
+          <input type="text" id="username" name="username" required />
+        </div>
+        <div class="form-group">
+          <label for="password">Password:</label>
+          <input type="password" id="password" name="password" required />
+        </div>
         <button type="button" onclick="handleLogin()">Login</button>
       </form>
 
-    <script>
+      <div class="signup-link">
+        <p>Don't have an account? <a href="/signup">Sign up here</a></p>
+      </div>
+
+      <script>
         async function handleLogin() {
           const username = document.getElementById('username').value;
           const password = document.getElementById('password').value;
@@ -40,18 +80,117 @@ export function renderLoginPageHTML(req: Request, res: Response) {
 
           const result = await response.json();
           if (result.success) {
-            // Redirect to another page
             window.location.href = result.redirect;
-            } else {
-            // Alert the user about invalid credentials
+          } else {
             alert(result.message);
-            }
+          }
         }
       </script>
     </html>
   `;
   res.send(htmlContent);
 }
+
+export function renderSignupPageHTML(req: Request, res: Response) {
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Sign Up - Job-Seeker</title>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          max-width: 600px;
+          margin: 0 auto;
+          padding: 20px;
+        }
+        .form-group {
+          margin-bottom: 15px;
+        }
+        label {
+          display: block;
+          margin-bottom: 5px;
+        }
+        input {
+          width: 100%;
+          padding: 8px;
+          margin-bottom: 10px;
+        }
+        button {
+          background-color: #007bff;
+          color: white;
+          padding: 10px 15px;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+        }
+        button:hover {
+          background-color: #0056b3;
+        }
+        .login-link {
+          margin-top: 15px;
+          text-align: center;
+        }
+      </style>
+    </head>
+    <body>
+      <h1>Sign Up for Job-Seeker</h1>
+
+      <form id="signup-form">
+        <div class="form-group">
+          <label for="username">Username:</label>
+          <input type="text" id="username" name="username" required />
+        </div>
+        <div class="form-group">
+          <label for="password">Password:</label>
+          <input type="password" id="password" name="password" required />
+        </div>
+        <div class="form-group">
+          <label for="age">Age:</label>
+          <input type="number" id="age" name="age" min="18" max="120" required />
+        </div>
+        <div class="form-group">
+          <label for="state">State (2-letter code):</label>
+          <input type="text" id="state" name="state" maxlength="2" pattern="[A-Za-z]{2}" required />
+        </div>
+        <button type="button" onclick="handleSignup()">Sign Up</button>
+      </form>
+
+      <div class="login-link">
+        <p>Already have an account? <a href="/">Log in here</a></p>
+      </div>
+
+      <script>
+        async function handleSignup() {
+          const username = document.getElementById('username').value;
+          const password = document.getElementById('password').value;
+          const age = parseInt(document.getElementById('age').value);
+          const state = document.getElementById('state').value.toUpperCase();
+
+          const response = await fetch('/signup', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ username, password, age, state }),
+          });
+
+          const result = await response.json();
+          if (result.success) {
+            window.location.href = result.redirect;
+          } else {
+            alert(result.message);
+          }
+        }
+      </script>
+    </body>
+    </html>
+  `;
+  res.send(htmlContent);
+}
+
 
 export function renderDashboard(
   req: Request,

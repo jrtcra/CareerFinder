@@ -12,6 +12,111 @@ export interface SkillAbbrType extends RowDataPacket {
   skill_abbr: string;
 }
 
+export interface MatchingPostingType extends RowDataPacket {
+  posting_id: number;
+  posting_title: string;
+  company_name: string;
+}
+
+export interface SkillFrequencyType extends RowDataPacket {
+  skill_abbr: string;
+  skill_count: number;
+}
+
+export async function performTransaction(
+  userId: number
+): Promise<{
+  matchingPostings: MatchingPostingType[];
+  commonSkills: SkillFrequencyType[];
+}> {
+  const connection = await connectToDatabase();
+
+  try {
+    await connection.execute("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ");
+    await connection.beginTransaction(); 
+    // Query 1: Fetch matching job postings
+    const [matchingPostings] = await connection.query<MatchingPostingType[]>(
+      `
+      SELECT
+          p.posting_id,
+          p.posting_title,
+          c.company_name
+      FROM
+          postings p
+          JOIN posting_skills ps ON p.posting_id = ps.posting_id
+          JOIN user_skills us ON us.skill_abbr = ps.skill_abbr
+          JOIN companies c ON c.company_id = p.company_id
+      WHERE
+          us.user_id = ?
+      GROUP BY
+          p.posting_id,
+          p.posting_title,
+          c.company_name
+      HAVING
+          COUNT(ps.skill_abbr) = (
+              SELECT
+                  COUNT(skill_abbr)
+              FROM
+                  posting_skills
+              WHERE
+                  posting_id = p.posting_id
+          );
+      `,
+      [userId]
+    );
+
+    // Query 2 (Query 3 in last checkpoint): Fetch common skills for high-salary jobs
+    const [commonSkills] = await connection.query<SkillFrequencyType[]>(
+      `
+      SELECT
+          s.skill_abbr,
+          COUNT(ps.skill_abbr) AS skill_count
+      FROM
+          postings p
+          JOIN jobs j ON p.job_id = j.job_id
+          JOIN posting_skills ps ON p.posting_id = ps.posting_id
+          JOIN skills s ON ps.skill_abbr = s.skill_abbr
+      WHERE
+          j.max_salary >= (
+              SELECT
+                  MIN(j1.max_salary)
+              FROM
+                  jobs j1
+              WHERE
+                  (
+                      SELECT
+                          COUNT(*)
+                      FROM
+                          jobs j2
+                      WHERE
+                          j2.max_salary > j1.max_salary
+                  ) <= (
+                      0.05 * (
+                          SELECT
+                              COUNT(*)
+                          FROM
+                              jobs
+                      )
+                  )
+          )
+      GROUP BY
+          s.skill_abbr
+      ORDER BY
+          skill_count DESC;
+      `
+    );
+
+    await connection.commit();
+
+    return { matchingPostings, commonSkills };
+  } catch (error) {
+    await connection.rollback();
+    throw error;
+  } finally {
+    await connection.end();
+  }
+}
+
 export async function connectToDatabase(): Promise<Connection> {
   const connection = await mysql.createConnection({
     host: "mysql", // Use service name defined in docker-compose.yml

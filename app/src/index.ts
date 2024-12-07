@@ -15,6 +15,7 @@ import {
   getUserSkills,
   addUserSkill,
   removeUserSkill,
+  performTransaction,
 } from "./sql-helper";
 
 const app = express();
@@ -79,6 +80,28 @@ app.post(
     res.json({ ok: true });
   })
 );
+
+// Handle transaction
+app.get(
+  "/api/transaction",
+  asyncHandler(async (req: Request, res: Response) => {
+    if (!req.session.userInformation) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
+
+    const userId = req.session.userInformation.user_id;
+
+    try {
+      const { matchingPostings, commonSkills } = await performTransaction(userId);
+      res.json({ matchingPostings, commonSkills });
+    } catch (error) {
+      const typedError = error as Error;
+      res.status(500).json({ error: "Failed to perform transaction", details: typedError.message });
+    }
+  })
+);
+
 
 app.get("/dashboard", (req, res) => {
   if (!req.session.userInformation) {

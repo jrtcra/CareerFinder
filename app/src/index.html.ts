@@ -71,6 +71,9 @@ export function renderDashboard(
         <p>This is a protected page accessible only after login.</p>
         <a href="/">Go back to login</a>
         <a href="/skills">Manage skills</a>
+        <a href="#" id="transactionButton">Get your matching job postings & Display skills for high-salary jobs</a>
+        <div id="transactionResults"></div>
+        <script src="/js/transaction.js"></script>
       </body>
       </html>
     `;

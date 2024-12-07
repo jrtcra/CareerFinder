@@ -8,6 +8,7 @@ import {
   renderDashboard,
   renderSkillsHTML,
   renderSearchHTML,
+  renderDetailHTML,
 } from "./index.html";
 import {
   verifyLogin,
@@ -18,6 +19,8 @@ import {
   removeUserSkill,
   searchJobPosting,
   getMatchingJobs,
+  getPostingSkills,
+  getPostingDetail,
 } from "./sql-helper";
 
 const app = express();
@@ -25,6 +28,7 @@ const PORT = 3000;
 
 app.use(express.json());
 app.use("/js", express.static(path.join(__dirname, "js")));
+app.use("/public", express.static(path.join(__dirname, "public")));
 
 declare module "express-session" {
   interface SessionData {
@@ -124,6 +128,16 @@ app.get(
   (req, res) => {
     renderSearchHTML(req, res);
   }
+);
+
+app.get(
+  "/detail/:posting_id",
+  asyncHandler(async (req: Request, res: Response) => {
+    const posting_id = Number(req.params.posting_id);
+    const skills = await getPostingSkills(posting_id);
+    const detail = await getPostingDetail(posting_id);
+    renderDetailHTML(req, res, detail[0], skills);
+  })
 );
 
 app.get("/api/all-skills", async (req: Request, res: Response) => {

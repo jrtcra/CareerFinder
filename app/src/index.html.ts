@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 
-import { UserInformationType } from "./sql-helper";
+import { JobDetailType, SkillAbbrType, UserInformationType } from "./sql-helper";
 
 export function renderLoginPageHTML(req: Request, res: Response) {
   const htmlContent = `
@@ -205,6 +205,7 @@ export function renderSearchHTML(req: Request, res: Response) {
     <table id="postingsTable">
       <thead>
         <tr>
+          <th>Job posting ID</th>
           <th>Job posting title</th>
           <th>Job posting description</th>
           <th>Company name</th>
@@ -237,6 +238,7 @@ export function renderSearchHTML(req: Request, res: Response) {
         postings.forEach((posting) => {
           const row = document.createElement("tr");
           row.innerHTML = \`
+            <td><a href="/detail/\${posting.posting_id}">\${posting.posting_id}</a></td>
             <td>\${posting.posting_title}</td>
             <td>\${posting.posting_description}</td>
             <td>\${posting.company_name}</td>
@@ -247,5 +249,60 @@ export function renderSearchHTML(req: Request, res: Response) {
     </script>
   </body>
   </html>`;
+  res.send(htmlContent);
+}
+
+// export function renderMatchingHTML(req: Request, res: Response) {
+  
+// }
+
+export function renderDetailHTML(req: Request, res: Response, detail: JobDetailType, skills: SkillAbbrType[]) {
+  let skill_str = '';
+  skills.forEach((skill) => {skill_str += skill.skill_abbr;skill_str += ' ';})
+  const htmlContent = `
+  <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Posting details</title>
+      <link rel="stylesheet" href="/public/ui4.css">
+    </head>
+    <body>
+      <!-- Header -->
+      <header>
+        <div class="header-content">
+          <h1>Posting details</h1>
+        </div>
+      </header>
+
+      <!-- Main content -->
+      <main>
+        <section class="career-details">
+          <h2>${detail.posting_title}</h2> <!-- Career Title Above White Box -->     
+          <div class="career-info">
+            <h3>Posting descriptions:</h3>
+            ${detail.posting_description}
+            <br>
+
+            <h3>Company name:</h3>
+            ${detail.company_name}
+            <br>
+
+            <h3>Company descriptions:</h3>
+            ${detail.company_description}
+            <br>
+
+            <h3>Median salary:</h3>
+            ${detail.med_salary}
+            <br>
+
+            <h3>Required skills:</h3>
+            ${skill_str}
+          </div>
+        </section>
+      </main>
+    </body>
+    </html>`;
   res.send(htmlContent);
 }

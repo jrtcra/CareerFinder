@@ -113,6 +113,7 @@ DELIMITER $$
 CREATE PROCEDURE GetMatchingPostings(IN userId INT)
 BEGIN
     SELECT
+        p.posting_id,
         p.posting_title,
         p.posting_description,
         c.company_name
@@ -144,6 +145,7 @@ DELIMITER $$
 CREATE PROCEDURE SearchForJobs(IN min_salary REAL, IN max_salary REAL)
 BEGIN
     SELECT
+        p.posting_id,
         p.posting_title,
         p.posting_description,
         c.company_name

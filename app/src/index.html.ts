@@ -10,22 +10,62 @@ export function renderLoginPageHTML(req: Request, res: Response) {
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Job-Seeker</title>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          max-width: 600px;
+          margin: 0 auto;
+          padding: 20px;
+        }
+        .form-group {
+          margin-bottom: 15px;
+        }
+        label {
+          display: block;
+          margin-bottom: 5px;
+        }
+        input {
+          width: 100%;
+          padding: 8px;
+          margin-bottom: 10px;
+        }
+        button {
+          background-color: #007bff;
+          color: white;
+          padding: 10px 15px;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+        }
+        button:hover {
+          background-color: #0056b3;
+        }
+        .signup-link {
+          margin-top: 15px;
+          text-align: center;
+        }
+      </style>
     </head>
     <body>
       <h1>Welcome to Job-Seeker! Please log in.</h1>
-    </body>
 
-    <form id="login-form">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required />
-        <br><br>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required />
-        <br><br>
+      <form id="login-form">
+        <div class="form-group">
+          <label for="username">Username:</label>
+          <input type="text" id="username" name="username" required />
+        </div>
+        <div class="form-group">
+          <label for="password">Password:</label>
+          <input type="password" id="password" name="password" required />
+        </div>
         <button type="button" onclick="handleLogin()">Login</button>
       </form>
 
-    <script>
+      <div class="signup-link">
+        <p>Don't have an account? <a href="/signup">Sign up here</a></p>
+      </div>
+
+      <script>
         async function handleLogin() {
           const username = document.getElementById('username').value;
           const password = document.getElementById('password').value;
@@ -40,18 +80,117 @@ export function renderLoginPageHTML(req: Request, res: Response) {
 
           const result = await response.json();
           if (result.success) {
-            // Redirect to another page
             window.location.href = result.redirect;
-            } else {
-            // Alert the user about invalid credentials
+          } else {
             alert(result.message);
-            }
+          }
         }
       </script>
     </html>
   `;
   res.send(htmlContent);
 }
+
+export function renderSignupPageHTML(req: Request, res: Response) {
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Sign Up - Job-Seeker</title>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          max-width: 600px;
+          margin: 0 auto;
+          padding: 20px;
+        }
+        .form-group {
+          margin-bottom: 15px;
+        }
+        label {
+          display: block;
+          margin-bottom: 5px;
+        }
+        input {
+          width: 100%;
+          padding: 8px;
+          margin-bottom: 10px;
+        }
+        button {
+          background-color: #007bff;
+          color: white;
+          padding: 10px 15px;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+        }
+        button:hover {
+          background-color: #0056b3;
+        }
+        .login-link {
+          margin-top: 15px;
+          text-align: center;
+        }
+      </style>
+    </head>
+    <body>
+      <h1>Sign Up for Job-Seeker</h1>
+
+      <form id="signup-form">
+        <div class="form-group">
+          <label for="username">Username:</label>
+          <input type="text" id="username" name="username" required />
+        </div>
+        <div class="form-group">
+          <label for="password">Password:</label>
+          <input type="password" id="password" name="password" required />
+        </div>
+        <div class="form-group">
+          <label for="age">Age:</label>
+          <input type="number" id="age" name="age" min="18" max="120" required />
+        </div>
+        <div class="form-group">
+          <label for="state">State (2-letter code):</label>
+          <input type="text" id="state" name="state" maxlength="2" pattern="[A-Za-z]{2}" required />
+        </div>
+        <button type="button" onclick="handleSignup()">Sign Up</button>
+      </form>
+
+      <div class="login-link">
+        <p>Already have an account? <a href="/">Log in here</a></p>
+      </div>
+
+      <script>
+        async function handleSignup() {
+          const username = document.getElementById('username').value;
+          const password = document.getElementById('password').value;
+          const age = parseInt(document.getElementById('age').value);
+          const state = document.getElementById('state').value.toUpperCase();
+
+          const response = await fetch('/signup', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ username, password, age, state }),
+          });
+
+          const result = await response.json();
+          if (result.success) {
+            window.location.href = result.redirect;
+          } else {
+            alert(result.message);
+          }
+        }
+      </script>
+    </body>
+    </html>
+  `;
+  res.send(htmlContent);
+}
+
 
 export function renderDashboard(
   req: Request,
@@ -74,6 +213,7 @@ export function renderDashboard(
         <a href="#" id="transactionButton">Get your matching job postings & Display skills for high-salary jobs</a>
         <div id="transactionResults"></div>
         <script src="/js/transaction.js"></script>
+        <a href="/profile">Update profile</a>
       </body>
       </html>
     `;
@@ -164,9 +304,130 @@ export function renderSkillsHTML(req: Request, res: Response) {
         </div>
       </div>
     </div>
-
     <script src="js/skills.js"></script>
   </body>
   </html>`;
+  res.send(htmlContent);
+}
+
+export function renderProfileHTML(req: Request, res: Response) {
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Edit Profile</title>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          max-width: 600px;
+          margin: 0 auto;
+          padding: 20px;
+        }
+        .form-group {
+          margin-bottom: 15px;
+        }
+        label {
+          display: block;
+          margin-bottom: 5px;
+        }
+        input[type="password"] {
+          width: 100%;
+          padding: 8px;
+          margin-bottom: 10px;
+        }
+        button {
+          background-color: #007bff;
+          color: white;
+          padding: 10px 15px;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+        }
+        button:hover {
+          background-color: #0056b3;
+        }
+        .error-message {
+          color: red;
+          margin-top: 10px;
+          display: none;
+        }
+        .success-message {
+          color: green;
+          margin-top: 10px;
+          display: none;
+        }
+      </style>
+    </head>
+    <body>
+      <h1>Edit Profile</h1>
+      <form id="password-form">
+        <div class="form-group">
+          <label for="oldPassword">Old Password:</label>
+          <input type="password" id="oldPassword" name="oldPassword" required>
+        </div>
+        <div class="form-group">
+          <label for="newPassword">New Password:</label>
+          <input type="password" id="newPassword" name="newPassword" required>
+        </div>
+        <div class="form-group">
+          <label for="confirmPassword">Confirm New Password:</label>
+          <input type="password" id="confirmPassword" name="confirmPassword" required>
+        </div>
+        <button type="button" onclick="updatePassword()">Update Password</button>
+      </form>
+      <div id="errorMessage" class="error-message"></div>
+      <div id="successMessage" class="success-message"></div>
+      <p><a href="/dashboard">Back to Dashboard</a></p>
+
+      <script>
+        async function updatePassword() {
+          const oldPassword = document.getElementById('oldPassword').value;
+          const newPassword = document.getElementById('newPassword').value;
+          const confirmPassword = document.getElementById('confirmPassword').value;
+          const errorMessage = document.getElementById('errorMessage');
+          const successMessage = document.getElementById('successMessage');
+
+          errorMessage.style.display = 'none';
+          successMessage.style.display = 'none';
+
+          if (newPassword !== confirmPassword) {
+            errorMessage.textContent = 'New passwords do not match';
+            errorMessage.style.display = 'block';
+            return;
+          }
+
+          try {
+            const response = await fetch('/api/update-password', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                oldPassword,
+                newPassword
+              }),
+            });
+
+            const result = await response.json();
+            
+            if (result.success) {
+              successMessage.textContent = 'Password updated successfully';
+              successMessage.style.display = 'block';
+              document.getElementById('password-form').reset();
+            } else {
+              errorMessage.textContent = result.message;
+              errorMessage.style.display = 'block';
+            }
+          } catch (error) {
+            errorMessage.textContent = 'An error occurred while updating the password';
+            errorMessage.style.display = 'block';
+          }
+        }
+      </script>
+    </body>
+    </html>
+  `;
   res.send(htmlContent);
 }

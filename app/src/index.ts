@@ -9,6 +9,8 @@ import {
   renderDashboard,
   renderSkillsHTML,
   renderProfileHTML,
+  renderSearchHTML,
+  renderDetailHTML,
 } from "./index.html";
 import {
   verifyLogin,
@@ -20,6 +22,10 @@ import {
   removeUserSkill,
   performTransaction,
   updateUserPassword,
+  searchJobPosting,
+  getMatchingJobs,
+  getPostingSkills,
+  getPostingDetail,
 } from "./sql-helper";
 
 const app = express();
@@ -27,6 +33,7 @@ const PORT = 3000;
 
 app.use(express.json());
 app.use("/js", express.static(path.join(__dirname, "js")));
+app.use("/public", express.static(path.join(__dirname, "public")));
 
 declare module "express-session" {
   interface SessionData {
@@ -93,6 +100,22 @@ app.post(
   })
 );
 
+// Handle job search
+app.post(
+  "/searching",
+  asyncHandler(async (req: Request, res: Response) => {
+    let { minsal, maxsal } = req.body;
+    if (!minsal) {
+      minsal = 0;
+    }
+    if (!maxsal) {
+      maxsal = 1e30;
+    }
+    const searchResult = await searchJobPosting(minsal, maxsal);
+    res.json(searchResult[0]);
+  })
+);
+
 // Handle skill addition
 app.post(
   "/skills/add",
@@ -151,6 +174,23 @@ app.get("/dashboard", (req, res) => {
 app.get("/skills", (req, res) => {
   renderSkillsHTML(req, res);
 });
+
+app.get(
+  "/search",
+  (req, res) => {
+    renderSearchHTML(req, res);
+  }
+);
+
+app.get(
+  "/detail/:posting_id",
+  asyncHandler(async (req: Request, res: Response) => {
+    const posting_id = Number(req.params.posting_id);
+    const skills = await getPostingSkills(posting_id);
+    const detail = await getPostingDetail(posting_id);
+    renderDetailHTML(req, res, detail[0], skills);
+  })
+);
 
 app.get("/api/all-skills", async (req: Request, res: Response) => {
   const queryResult = await getAllSkills();

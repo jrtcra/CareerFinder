@@ -14,7 +14,8 @@ CREATE TABLE
     IF NOT EXISTS skills (
         skill_abbr VARCHAR(10) PRIMARY KEY,
         embedding REAL NOT NULL,
-        skill_name VARCHAR(50) NOT NULL
+        skill_name VARCHAR(50) NOT NULL,
+        usage_count INT DEFAULT 0
     );
 
 CREATE TABLE
@@ -62,6 +63,29 @@ CREATE INDEX company_name_idx ON companies (company_name);
 
 CREATE INDEX user_age_idx ON user_information (age);
 
+DELIMITER $$
+
+CREATE TRIGGER after_skill_add
+AFTER INSERT ON user_skills
+FOR EACH ROW
+BEGIN
+    UPDATE skills 
+    SET usage_count = usage_count + 1 
+    WHERE skill_abbr = NEW.skill_abbr;
+END$$
+
+CREATE TRIGGER after_skill_remove
+AFTER DELETE ON user_skills
+FOR EACH ROW
+BEGIN
+    UPDATE skills 
+    SET usage_count = GREATEST(usage_count - 1, 0)
+    WHERE skill_abbr = OLD.skill_abbr;
+END$$
+
+-- Change delimiter back
+DELIMITER ;
+
 LOAD DATA INFILE '/var/lib/mysql-files/jobs_values.csv' 
 INTO TABLE `jobs` 
 COLUMNS TERMINATED BY ',' ENCLOSED BY '\"' 
@@ -78,7 +102,8 @@ LINES TERMINATED BY '\n';
 LOAD DATA INFILE '/var/lib/mysql-files/skills_values.csv' 
 INTO TABLE `skills` 
 COLUMNS TERMINATED BY ',' ENCLOSED BY '\"' 
-LINES TERMINATED BY '\n' (skill_abbr, skill_name, embedding);
+LINES TERMINATED BY '\n' 
+(skill_abbr, skill_name, embedding, usage_count);
 
 LOAD DATA INFILE '/var/lib/mysql-files/user_skills_values.csv' 
 INTO TABLE `user_skills` 

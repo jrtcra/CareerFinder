@@ -8,6 +8,12 @@ export interface UserInformationType extends RowDataPacket {
   state: string;
 }
 
+export interface PopularSkillType extends RowDataPacket {
+  skill_abbr: string;
+  skill_name: string;
+  usage_count: number;
+}
+
 export interface SkillAbbrType extends RowDataPacket {
   skill_abbr: string;
 }
@@ -36,6 +42,19 @@ export interface JobDetailType extends RowDataPacket {
   company_name: string;
   company_description: string;
   med_salary: number;
+}
+
+export async function getPopularSkills(): Promise<PopularSkillType[]> {
+  const connection = await connectToDatabase();
+
+  const [rows] = await connection.query<PopularSkillType[]>(
+    `SELECT skill_abbr, skill_name, usage_count 
+     FROM skills 
+     ORDER BY usage_count DESC 
+     LIMIT 10`
+  );
+  
+  return rows;
 }
 
 export async function performTransaction(
@@ -303,3 +322,4 @@ export async function getPostingDetail(
   );
   return rows;
 }
+

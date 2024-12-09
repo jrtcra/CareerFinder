@@ -26,6 +26,7 @@ import {
   getMatchingJobs,
   getPostingSkills,
   getPostingDetail,
+  getPopularSkills
 } from "./sql-helper";
 
 const app = express();
@@ -84,6 +85,11 @@ app.post(
     }
   })
 );
+
+app.get("/api/popular-skills", asyncHandler(async (req: Request, res: Response) => {
+  const popularSkills = await getPopularSkills();
+  res.json({ popularSkills });
+}));
 
 // Handle login form submission
 app.post(

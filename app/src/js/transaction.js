@@ -23,55 +23,83 @@ document.addEventListener("DOMContentLoaded", () => {
           if (resultsDiv) {
             resultsDiv.innerHTML = "";
 
-            // Display matching job postings
+            // Create flex container
+            const flexContainer = document.createElement("div");
+            flexContainer.style.display = "flex";
+            flexContainer.style.justifyContent = "space-between";
+            flexContainer.style.gap = "20px";
+            flexContainer.style.margin = "20px 0";
+            resultsDiv.appendChild(flexContainer);
+
+            // Create three sections
+            const section1 = document.createElement("div");
+            const section2 = document.createElement("div");
+            const section3 = document.createElement("div");
+
+            [section1, section2, section3].forEach(section => {
+              section.style.flex = "1";
+              section.style.backgroundColor = "#f8f9fa";
+              section.style.padding = "20px";
+              section.style.borderRadius = "8px";
+              section.style.boxShadow = "0 2px 4px rgba(0,0,0,0.1)";
+              flexContainer.appendChild(section);
+            });
+
+            // Matching Job Postings Section
             const postingsTitle = document.createElement("h3");
             postingsTitle.textContent = "Matching Job Postings";
-            resultsDiv.appendChild(postingsTitle);
+            postingsTitle.style.marginTop = "0";
+            section1.appendChild(postingsTitle);
 
             if (transactionData.matchingPostings.length) {
               const postingsList = document.createElement("ul");
+              postingsList.style.paddingLeft = "20px";
               transactionData.matchingPostings.forEach((posting) => {
                 const item = document.createElement("li");
                 item.textContent = `${posting.posting_title} at ${posting.company_name}`;
                 postingsList.appendChild(item);
               });
-              resultsDiv.appendChild(postingsList);
+              section1.appendChild(postingsList);
             } else {
-              resultsDiv.appendChild(document.createTextNode("No matching postings found."));
+              section1.appendChild(document.createTextNode("No matching postings found."));
             }
 
-            // Display common skills for high-salary jobs
+            // Common Skills Section
             const skillsTitle = document.createElement("h3");
             skillsTitle.textContent = "Common Skills for High-Salary Jobs";
-            resultsDiv.appendChild(skillsTitle);
+            skillsTitle.style.marginTop = "0";
+            section2.appendChild(skillsTitle);
 
             if (transactionData.commonSkills.length) {
               const skillsList = document.createElement("ul");
+              skillsList.style.paddingLeft = "20px";
               transactionData.commonSkills.forEach((skill) => {
                 const item = document.createElement("li");
-                item.textContent = `${skill.skill_abbr} (${skill.skill_count} occurrences)`;
+                item.textContent = `${skill.skill_name} (${skill.skill_count} occurrences)`;
                 skillsList.appendChild(item);
               });
-              resultsDiv.appendChild(skillsList);
+              section2.appendChild(skillsList);
             } else {
-              resultsDiv.appendChild(document.createTextNode("No skills found."));
+              section2.appendChild(document.createTextNode("No skills found."));
             }
 
-            // Display popular skills
+            // Popular Skills Section
             const popularTitle = document.createElement("h3");
             popularTitle.textContent = "Most Popular Skills";
-            resultsDiv.appendChild(popularTitle);
+            popularTitle.style.marginTop = "0";
+            section3.appendChild(popularTitle);
 
             if (popularSkillsData.popularSkills.length) {
-              const popularList = document.createElement("ul");
+              const popularList = document.createElement("ol");  // Changed to ordered list
+              popularList.style.paddingLeft = "20px";
               popularSkillsData.popularSkills.forEach((skill) => {
                 const item = document.createElement("li");
                 item.textContent = `${skill.skill_name} (${skill.usage_count} users)`;
                 popularList.appendChild(item);
               });
-              resultsDiv.appendChild(popularList);
+              section3.appendChild(popularList);
             } else {
-              resultsDiv.appendChild(document.createTextNode("No popular skills found."));
+              section3.appendChild(document.createTextNode("No popular skills found."));
             }
           }
         })

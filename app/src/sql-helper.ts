@@ -26,6 +26,7 @@ export interface MatchingPostingType extends RowDataPacket {
 
 export interface SkillFrequencyType extends RowDataPacket {
   skill_abbr: string;
+  skill_name: string;
   skill_count: number;
 }
 
@@ -104,6 +105,7 @@ export async function performTransaction(
       `
       SELECT
           s.skill_abbr,
+          s.skill_name,
           COUNT(ps.skill_abbr) AS skill_count
       FROM
           postings p
@@ -134,7 +136,8 @@ export async function performTransaction(
                   )
           )
       GROUP BY
-          s.skill_abbr
+          s.skill_abbr,
+          s.skill_name
       ORDER BY
           skill_count DESC;
       `

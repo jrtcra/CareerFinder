@@ -2,6 +2,67 @@ import { Request, Response } from "express";
 
 import { UserInformationType, JobDetailType, SkillAbbrType } from "./sql-helper";
 
+function getCommonHeaderStyle() {
+  return `
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .header {
+      background-color: #006400;
+      padding: 1rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+    }
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .nav-brand {
+      color: white;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    .nav-links {
+      display: flex;
+      gap: 1rem;
+    }
+    .nav-link {
+      color: white;
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      transition: background-color 0.2s;
+    }
+    .nav-link:hover {
+      background-color: rgba(255,255,255,0.1);
+    }
+    .main-content {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+  `;
+}
+
+function getCommonHeader(title: string) {
+  return `
+    <header class="header">
+      <nav class="nav-container">
+        <div class="nav-brand">${title}</div>
+        <div class="nav-links">
+          <a href="/dashboard" class="nav-link">Back to Home</a>
+        </div>
+      </nav>
+    </header>
+  `;
+}
+
 export function renderLoginPageHTML(req: Request, res: Response) {
   const htmlContent = `
     <!DOCTYPE html>
@@ -204,16 +265,87 @@ export function renderDashboard(
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Dashboard</title>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+          }
+          .header {
+            background-color: #006400;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+          }
+          .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          }
+          .nav-brand {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+          }
+          .nav-links {
+            display: flex;
+            gap: 1rem;
+          }
+          .nav-link {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+          }
+          .nav-link:hover {
+            background-color: rgba(255,255,255,0.1);
+          }
+          .main-content {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+          }
+          h1 {
+            color: #333;
+            margin-bottom: 2rem;
+          }
+          #transactionButton {
+            display: inline-block;
+            background-color: #006400;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            text-decoration: none;
+            margin-bottom: 1rem;
+            transition: background-color 0.2s;
+          }
+          #transactionButton:hover {
+            background-color: #005400;
+          }
+        </style>
       </head>
       <body>
-        <h1>Welcome to the Dashboard, ${userInformation.username}!</h1>
-        <p>This is a protected page accessible only after login.</p>
-        <a href="/">Go back to login</a>
-        <a href="/skills">Manage skills</a>
-        <a href="/search">Search for jobs</a>
-        <a href="/profile">Update profile</a><br>
-        <a href="#" id="transactionButton">Get your matching job postings & Display skills for high-salary jobs</a>
-        <div id="transactionResults"></div>
+        <header class="header">
+          <nav class="nav-container">
+            <div class="nav-brand">Job-Seeker</div>
+            <div class="nav-links">
+              <a href="/" class="nav-link">Log Out</a>
+              <a href="/skills" class="nav-link">Manage Skills</a>
+              <a href="/search" class="nav-link">Search Jobs</a>
+              <a href="/profile" class="nav-link">Update Profile</a>
+            </div>
+          </nav>
+        </header>
+
+        <div class="main-content">
+          <h1>Welcome to the Dashboard, ${userInformation.username}!</h1>
+          <a href="#" id="transactionButton">Get your matching job postings & Display skills for high-salary jobs</a>
+          <div id="transactionResults"></div>
+        </div>
         <script src="/js/transaction.js"></script>
       </body>
       </html>
@@ -229,19 +361,12 @@ export function renderSkillsHTML(req: Request, res: Response) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Skill Management</title>
     <style>
-      body {
-        font-family: Arial, sans-serif;
-        display: flex;
-        justify-content: center;
-        align-items: flex-start;
-        min-height: 100vh;
-        margin: 0;
-        padding: 20px;
-        background-color: #f9f9f9;
-      }
+      ${getCommonHeaderStyle()}
       .container {
         display: flex;
         gap: 20px;
+        padding: 20px;
+        justify-content: center;
       }
       .panel {
         width: 300px;
@@ -288,20 +413,16 @@ export function renderSkillsHTML(req: Request, res: Response) {
     </style>
   </head>
   <body>
+    ${getCommonHeader('Manage Skills')}
     <div class="container">
-      <!-- Panel 1: Skills the user has -->
       <div class="panel" id="panel1">
         <div class="panel-header">Skills You Have</div>
         <div class="panel-content" id="skillsUserHas">
-          <!-- Skills dynamically populated here -->
         </div>
       </div>
-
-      <!-- Panel 2: Skills the user doesn't have -->
       <div class="panel" id="panel2">
         <div class="panel-header">Skills You Don't Have</div>
         <div class="panel-content" id="skillsUserDoesNotHave">
-          <!-- Skills dynamically populated here -->
         </div>
       </div>
     </div>
@@ -320,12 +441,7 @@ export function renderProfileHTML(req: Request, res: Response) {
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Edit Profile</title>
       <style>
-        body {
-          font-family: Arial, sans-serif;
-          max-width: 600px;
-          margin: 0 auto;
-          padding: 20px;
-        }
+        ${getCommonHeaderStyle()}
         .form-group {
           margin-bottom: 15px;
         }
@@ -339,7 +455,7 @@ export function renderProfileHTML(req: Request, res: Response) {
           margin-bottom: 10px;
         }
         button {
-          background-color: #007bff;
+          background-color: #006400;
           color: white;
           padding: 10px 15px;
           border: none;
@@ -347,7 +463,7 @@ export function renderProfileHTML(req: Request, res: Response) {
           cursor: pointer;
         }
         button:hover {
-          background-color: #0056b3;
+          background-color: #005400;
         }
         .error-message {
           color: red;
@@ -362,25 +478,26 @@ export function renderProfileHTML(req: Request, res: Response) {
       </style>
     </head>
     <body>
-      <h1>Edit Profile</h1>
-      <form id="password-form">
-        <div class="form-group">
-          <label for="oldPassword">Old Password:</label>
-          <input type="password" id="oldPassword" name="oldPassword" required>
-        </div>
-        <div class="form-group">
-          <label for="newPassword">New Password:</label>
-          <input type="password" id="newPassword" name="newPassword" required>
-        </div>
-        <div class="form-group">
-          <label for="confirmPassword">Confirm New Password:</label>
-          <input type="password" id="confirmPassword" name="confirmPassword" required>
-        </div>
-        <button type="button" onclick="updatePassword()">Update Password</button>
-      </form>
-      <div id="errorMessage" class="error-message"></div>
-      <div id="successMessage" class="success-message"></div>
-      <p><a href="/dashboard">Back to Dashboard</a></p>
+      ${getCommonHeader('Update Profile')}
+      <div class="main-content">
+        <form id="password-form">
+          <div class="form-group">
+            <label for="oldPassword">Old Password:</label>
+            <input type="password" id="oldPassword" name="oldPassword" required>
+          </div>
+          <div class="form-group">
+            <label for="newPassword">New Password:</label>
+            <input type="password" id="newPassword" name="newPassword" required>
+          </div>
+          <div class="form-group">
+            <label for="confirmPassword">Confirm New Password:</label>
+            <input type="password" id="confirmPassword" name="confirmPassword" required>
+          </div>
+          <button type="button" onclick="updatePassword()">Update Password</button>
+        </form>
+        <div id="errorMessage" class="error-message"></div>
+        <div id="successMessage" class="success-message"></div>
+      </div>
 
       <script>
         async function updatePassword() {
@@ -441,43 +558,94 @@ export function renderSearchHTML(req: Request, res: Response) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Search for a job</title>
     <style>
+      ${getCommonHeaderStyle()}
+      .search-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .table-container {
+        width: 100%;
+        overflow-x: auto;
+        margin-top: 20px;
+      }
       table {
         width: 100%;
         border-collapse: collapse;
+        min-width: 600px;
       }
       th, td {
         border: 1px solid #ddd;
-        padding: 8px;
+        padding: 12px;
+        text-align: left;
       }
       th {
         background-color: #f2f2f2;
+        white-space: nowrap;
+      }
+      td {
+        max-width: 300px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: normal;
+      }
+      form {
+        margin: 20px 0;
+      }
+      .form-row {
+        margin-bottom: 15px;
+      }
+      label {
+        display: inline-block;
+        width: 120px;
+      }
+      input[type="number"] {
+        padding: 8px;
+        width: 200px;
+      }
+      button {
+        padding: 8px 16px;
+        background-color: #006400;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-top: 10px;
+      }
+      button:hover {
+        background-color: #005400;
       }
     </style>
   </head>
   <body>
-    <form id="search-form">
-      <label for="min-salary">Minimum salary:</label>
-      <input type="number" id="min-salary" name="min-salary"/>
-      <br><br>
-      <label for="max-salary">Maximum salary:</label>
-      <input type="number" id="max-salary" name="max-salary"/>
-      <br><br>
-      <button type="button" onclick="handleSearch()">Search</button>
-    </form>
-    <br>
-    <table id="postingsTable">
-      <thead>
-        <tr>
-          <th>Job posting ID</th>
-          <th>Job posting title</th>
-          <th>Job posting description</th>
-          <th>Company name</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Rows will be populated dynamically -->
-      </tbody>
-    </table>
+    ${getCommonHeader('Search Jobs')}
+    <div class="search-container">
+      <form id="search-form">
+        <div class="form-row">
+          <label for="min-salary">Minimum salary:</label>
+          <input type="number" id="min-salary" name="min-salary"/>
+        </div>
+        <div class="form-row">
+          <label for="max-salary">Maximum salary:</label>
+          <input type="number" id="max-salary" name="max-salary"/>
+        </div>
+        <button type="button" onclick="handleSearch()">Search</button>
+      </form>
+      <div class="table-container">
+        <table id="postingsTable">
+          <thead>
+            <tr>
+              <th>Job posting ID</th>
+              <th>Job posting title</th>
+              <th>Job posting description</th>
+              <th>Company name</th>
+            </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        </table>
+      </div>
+    </div>
     <script>
       async function handleSearch() {
         const minsal = document.getElementById('min-salary').value;
@@ -494,7 +662,7 @@ export function renderSearchHTML(req: Request, res: Response) {
       }
       function populateTable(postings) {
         const tableBody = document.querySelector("#postingsTable tbody");
-        tableBody.innerHTML = ""; // Clear existing rows
+        tableBody.innerHTML = "";
         postings.forEach((posting) => {
           const row = document.createElement("tr");
           row.innerHTML = \`
